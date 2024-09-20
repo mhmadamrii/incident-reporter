@@ -1,22 +1,27 @@
+import Link from "next/link";
+import { Github } from "lucide-react";
+
 export function Navbar() {
   return (
-    <nav className="flex items-center justify-between gap-4 bg-white/10 px-4 py-6">
+    <nav className="flex w-full items-center justify-between gap-4 bg-white/10 px-4 py-6">
       <div className="flex items-center gap-4">
-        <h1 className="text-2xl font-bold">Incident Reporter</h1>
+        <Link href="/" className="text-2xl font-bold">
+          Incident Reporter
+        </Link>
       </div>
       <div className="flex items-center gap-4">
-        <a
-          className="rounded-full bg-white/10 px-4 py-2 font-semibold no-underline transition hover:bg-white/20"
-          href="/api/auth/signin"
+        <Link
+          className="rounded-full bg-black px-3 py-3 text-white transition-all"
+          href="https://github.com/daniel-radcliffe/incident-reporter"
         >
-          Sign in
-        </a>
-        <a
-          className="rounded-full bg-white/10 px-4 py-2 font-semibold no-underline transition hover:bg-white/20"
-          href="/api/auth/signup"
+          <Github />
+        </Link>
+        <Link
+          className="rounded-full bg-blue-500 px-6 py-3 text-white transition-all hover:bg-blue-400"
+          href="/login"
         >
-          Sign up
-        </a>
+          Login
+        </Link>
       </div>
     </nav>
   );

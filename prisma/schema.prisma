@@ -86,3 +86,20 @@ model Report {
 
     @@index([content])
 }
+
+model Incident {
+    id          Int            @id @default(autoincrement())
+    title       String
+    description String
+    status      IncidentStatus
+    fix         String? // Optional field for possible fixes
+    createdAt   DateTime       @default(now())
+    updatedAt   DateTime       @updatedAt
+}
+
+enum IncidentStatus {
+    OPEN
+    IN_PROGRESS
+    FIXED
+    CLOSED
+}
