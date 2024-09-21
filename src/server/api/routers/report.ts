@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 
+import { IncidentStatus, IncidentType } from "@prisma/client";
 import { z } from "zod";
 import { env } from "~/env";
 
@@ -37,22 +38,22 @@ export const reportRouter = createTRPCRouter({
       z.object({
         title: z.string().min(1),
         description: z.string(),
-        status: z.string(),
+        status: z.nativeEnum(IncidentStatus),
+        type: z.nativeEnum(IncidentType),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const response = await client.chat.completions.create({
-        messages: [{ role: "user", content: input.description }],
-        model: "llama3-8b-8192",
-      });
-      console.log("response", JSON.stringify(response));
-
       return ctx.db.incident.create({
         data: {
-          title: input.title,
-          description: response?.choices?.[0]?.message?.content || "",
-          status: "OPEN",
+          company: input.title,
+          type: input.type,
+          description: input.description,
+          status: input.status,
         },
       });
     }),
+
+  getReportedIncidents: publicProcedure.query(async ({ ctx }) => {
+    return ctx.db.incident.findMany();
+  }),
 });

@@ -86,9 +86,10 @@ model Report {
 
 model Incident {
     id          Int            @id @default(autoincrement())
-    title       String
+    company     String
     description String
     status      IncidentStatus
+    type        IncidentType
     fix         String? // Optional field for possible fixes
     createdAt   DateTime       @default(now())
     updatedAt   DateTime       @updatedAt
@@ -99,4 +100,13 @@ enum IncidentStatus {
     IN_PROGRESS
     FIXED
     CLOSED
+}
+
+enum IncidentType {
+    DATA_BREACH
+    MALWARE
+    PHISHING
+    RANSOMWARE
+    DDOS
+    BUG
 }

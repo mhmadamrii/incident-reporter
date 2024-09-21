@@ -1,8 +1,13 @@
-"use client";
+import { HydrateClient, api } from "~/trpc/server";
+import { NoIncidentReported } from "./no-incident-reported";
+import { HeaderListReportedIncident } from "./header-list-reported-incident";
 
-import { Plus } from "lucide-react";
-import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
+import {
+  cn,
+  defineRenderIncidentStatus,
+  defineRenderIncidentType,
+  extractIncidentDetails,
+} from "~/lib/utils";
 
 import {
   Card,
@@ -12,48 +17,61 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 
-export function ListReportedIncidents() {
-  const router = useRouter();
+export async function ListReportedIncidents() {
+  const incidents = await api.report.getReportedIncidents();
+
   return (
-    <section className="flex w-3/4 flex-col gap-4 px-4">
-      <div className="flex w-full items-center justify-between py-4">
-        <h1 className="text-2xl font-bold">
-          Reported Incidents <span className="text-gray-500">(0)</span>
-        </h1>
+    <HydrateClient>
+      <section className="flex w-3/4 flex-col gap-4 px-4">
+        <HeaderListReportedIncident total={incidents.length} />
+        <div className="flex flex-col gap-3">
+          {incidents.map(({ id, company, description, status, type }) => (
+            <Card key={id} className="w-full cursor-pointer hover:bg-gray-50">
+              <CardHeader>
+                <CardTitle>
+                  {company} |{" "}
+                  {extractIncidentDetails(description).incidentNumber}
+                </CardTitle>
+                <CardDescription>
+                  {extractIncidentDetails(description).summary}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between">
+                  <div>
+                    <h1>{defineRenderIncidentType(type)}</h1>
+                  </div>
 
-        <Button
-          onClick={() => router.push("/create/123")}
-          className="flex items-center gap-2"
-        >
-          <Plus />
-          Report Incident
-        </Button>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <Card key={i} className="w-full cursor-pointer hover:bg-gray-50">
-            <CardHeader>
-              <CardTitle>Card Title</CardTitle>
-              <CardDescription>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Non,
-                aliquam?
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between">
-                <div>
-                  <h1>Company name</h1>
+                  <div className="flex gap-2">
+                    <h1>{extractIncidentDetails(description).dateAndTime}</h1>
+                    <div
+                      className={cn("flex gap-2", {
+                        "flex w-[100px] items-center justify-center rounded-md bg-red-200 text-red-600":
+                          status === "OPEN",
+                        "flex w-[100px] items-center justify-center rounded-md bg-green-200 text-green-600":
+                          status === "FIXED",
+                        "flex w-[100px] items-center justify-center rounded-md bg-yellow-200 text-yellow-600":
+                          status === "IN_PROGRESS",
+                        "flex w-[100px] items-center justify-center rounded-md bg-gray-200 text-gray-600":
+                          status === "CLOSED",
+                      })}
+                    >
+                      <h1
+                        className={cn("text-center", {
+                          "animate-pulse": status === "OPEN",
+                        })}
+                      >
+                        {defineRenderIncidentStatus(status)}
+                      </h1>
+                    </div>
+                  </div>
                 </div>
-
-                <div>
-                  <h1>Incident name</h1>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </section>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        {incidents.length === 0 && <NoIncidentReported />}
+      </section>
+    </HydrateClient>
   );
 }

@@ -12,7 +12,7 @@ export function Navbar() {
       <div className="flex items-center gap-4">
         <Link
           className="rounded-full bg-black px-3 py-3 text-white transition-all"
-          href="https://github.com/daniel-radcliffe/incident-reporter"
+          href="https://github.com/mhmadamrii/incident-reporter"
         >
           <Github />
         </Link>

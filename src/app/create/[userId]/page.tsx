@@ -1,12 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 
 import { Brain } from "lucide-react";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
-import { cn, generateRandomNumber, removeAsterisks } from "~/lib/utils";
 import { Textarea } from "~/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LIST_COMPANIES, TYPE_OF_INCIDENT } from "~/lib/constants";
@@ -39,15 +37,23 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 
+import {
+  cn,
+  defineIncidentType,
+  generateRandomIncidentStatus,
+  generateRandomNumber,
+  removeAsterisks,
+} from "~/lib/utils";
+
 const FormSchema = z.object({
   company: z.string({
-    required_error: "Please select an email to display.",
+    required_error: "Please select a company to display.",
   }),
   incident_type: z.string({
-    required_error: "Please select an email to display.",
+    required_error: "Please select an incident type to display.",
   }),
   description: z.string({
-    required_error: "Please select an email to display.",
+    required_error: "Please provide more details about the incident.",
   }),
 });
 
@@ -96,16 +102,16 @@ export default function Create() {
     );
 
     createIncidentByAi({
-      description: `Generate a short incident report for ${form.getValues("company")} involving ${form.getValues("incident_type")}. The report should be structured like a formal incident report without any introductory sentence(like Here is a short incident report for xxxx). With following format: Incident Report #XXXX, Type of Incident: {type}, Date and Time: {date and time}, Affected Platform/services: {service}, summary`,
+      description: `Generate a short incident report (around 1500 characters cannot be more than 1600) for ${form.getValues("company")} involving ${form.getValues("incident_type")}. The report should be structured like a formal incident report without any introductory sentence(like Here is a short incident report for xxxx). With following format: Title Incident, Incident Report Number #XXXX, Type of Incident: (bug/data breach/phishing/ransomware/ddos), Date and Time: (random date), Affected Platform/services: (payment/email/social media/etc), summary.`,
     });
   };
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log("data", data);
     mutate({
       title: data.company,
       description: data.description,
-      status: "OPEN",
+      type: defineIncidentType(data.incident_type),
+      status: generateRandomIncidentStatus(),
     });
   }
 
@@ -220,8 +226,7 @@ export default function Create() {
                     </SelectContent>
                   </Select>
                   <FormDescription>
-                    You can manage email addresses in your{" "}
-                    <Link href="/examples/forms">email settings</Link>.
+                    Select the type of incident related to the report.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -244,7 +249,7 @@ export default function Create() {
                     />
                   </FormControl>
                   <FormDescription>
-                    You can <span>@mention</span> other users and organizations.
+                    Provide a detailed description of the incident.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -252,11 +257,21 @@ export default function Create() {
             />
           </div>
           <Button
-            disabled={isLoadingAi || isPendingCreateReport}
-            className="w-full"
+            className={cn("w-full border border-black", {
+              "bg-gray-50": isPendingCreateReport,
+            })}
             type="submit"
           >
-            Create Report
+            {isPendingCreateReport ? (
+              <Image
+                alt="loading"
+                src={"/svg/goex.svg"}
+                width={24}
+                height={24}
+              />
+            ) : (
+              "Create Report"
+            )}
           </Button>
         </form>
       </Form>
