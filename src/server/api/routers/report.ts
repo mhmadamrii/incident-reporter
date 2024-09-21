@@ -1,4 +1,7 @@
+import Groq from "groq-sdk";
+
 import { z } from "zod";
+import { env } from "~/env";
 
 import {
   createTRPCRouter,
@@ -6,40 +9,50 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 
+const client = new Groq({
+  apiKey: env.GROQ_API_KEY, // This is the default and can be omitted
+  dangerouslyAllowBrowser: true,
+});
+
 export const reportRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
+  createReportIncidentByAi: publicProcedure
+    .input(
+      z.object({
+        description: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const response = await client.chat.completions.create({
+        messages: [{ role: "user", content: input.description }],
+        model: "llama3-8b-8192",
+      });
+
       return {
-        greeting: `Hello ${input.text}`,
+        description: response?.choices?.[0]?.message?.content || "",
       };
     }),
 
-  getAccounts: publicProcedure.query(({ ctx }) => {
-    return ctx.db.account.findMany();
-  }),
-
-  create: protectedProcedure
-    .input(z.object({ name: z.string().min(1) }))
+  createReportIncident: publicProcedure
+    .input(
+      z.object({
+        title: z.string().min(1),
+        description: z.string(),
+        status: z.string(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.post.create({
+      const response = await client.chat.completions.create({
+        messages: [{ role: "user", content: input.description }],
+        model: "llama3-8b-8192",
+      });
+      console.log("response", JSON.stringify(response));
+
+      return ctx.db.incident.create({
         data: {
-          name: input.name,
-          createdBy: { connect: { id: ctx.session.user.id } },
+          title: input.title,
+          description: response?.choices?.[0]?.message?.content || "",
+          status: "OPEN",
         },
       });
     }),
-
-  getLatest: protectedProcedure.query(async ({ ctx }) => {
-    const post = await ctx.db.post.findFirst({
-      orderBy: { createdAt: "desc" },
-      where: { createdBy: { id: ctx.session.user.id } },
-    });
-
-    return post ?? null;
-  }),
-
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { Bug } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 
@@ -8,7 +8,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
@@ -26,7 +25,7 @@ export function ListReportedIncidents() {
           onClick={() => router.push("/create/123")}
           className="flex items-center gap-2"
         >
-          <Bug />
+          <Plus />
           Report Incident
         </Button>
       </div>

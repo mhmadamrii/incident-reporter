@@ -15,14 +15,11 @@ export default async function Home() {
   void api.post.getLatest.prefetch();
 
   return (
-    <HydrateClient>
-      <main className="flex flex-col items-center justify-center gap-4 p-4">
-        <Navbar />
-        <SearchIncidents />
-        <Suspense fallback={<div>Loading...</div>}>
-          <ListReportedIncidents />
-        </Suspense>
-      </main>
-    </HydrateClient>
+    <main className="mt-24 flex flex-col items-center justify-center gap-4 p-4">
+      <SearchIncidents />
+      <Suspense fallback={<div>Loading...</div>}>
+        <ListReportedIncidents />
+      </Suspense>
+    </main>
   );
 }
