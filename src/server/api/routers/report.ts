@@ -53,6 +53,20 @@ export const reportRouter = createTRPCRouter({
       });
     }),
 
+  editIncidentStatus: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        status: z.nativeEnum(IncidentStatus),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.incident.update({
+        where: { id: input.id },
+        data: { status: input.status },
+      });
+    }),
+
   getReportedIncidents: publicProcedure.query(async ({ ctx }) => {
     return ctx.db.incident.findMany();
   }),

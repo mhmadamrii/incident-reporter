@@ -1,6 +1,8 @@
 import { HydrateClient, api } from "~/trpc/server";
 import { NoIncidentReported } from "./no-incident-reported";
 import { HeaderListReportedIncident } from "./header-list-reported-incident";
+import { EditIncidentStatus } from "./edit-incident-status";
+import { getServerAuthSession } from "~/server/auth";
 
 import {
   cn,
@@ -19,6 +21,7 @@ import {
 
 export async function ListReportedIncidents() {
   const incidents = await api.report.getReportedIncidents();
+  const session = await getServerAuthSession();
 
   return (
     <HydrateClient>
@@ -28,9 +31,13 @@ export async function ListReportedIncidents() {
           {incidents.map(({ id, company, description, status, type }) => (
             <Card key={id} className="w-full cursor-pointer hover:bg-gray-50">
               <CardHeader>
-                <CardTitle>
-                  {company} |{" "}
-                  {extractIncidentDetails(description).incidentNumber}
+                <CardTitle className="flex w-full items-center justify-between">
+                  <div>
+                    {company} |{" "}
+                    {extractIncidentDetails(description).incidentNumber}
+                  </div>
+
+                  <EditIncidentStatus user={session?.user} idIncident={id} />
                 </CardTitle>
                 <CardDescription>
                   {extractIncidentDetails(description).summary}

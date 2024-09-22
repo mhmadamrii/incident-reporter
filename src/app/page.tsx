@@ -5,7 +5,7 @@ import { ListReportedIncidentSkeleton } from "~/components/globals/list-reported
 
 export default async function Home() {
   return (
-    <main className="mt-24 flex flex-col items-center justify-center gap-4 p-4">
+    <main className="mt-20 flex flex-col items-center justify-center gap-4 p-4">
       <SearchIncidents />
       <Suspense fallback={<ListReportedIncidentSkeleton />}>
         <ListReportedIncidents />

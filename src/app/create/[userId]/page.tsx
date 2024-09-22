@@ -117,7 +117,7 @@ export default function Create() {
 
   return (
     <main className="mb-[200px] flex h-screen w-full flex-1 flex-col items-center gap-3 px-6">
-      <div className="mt-28 flex h-[100px] w-full flex-col justify-end">
+      <div className="mt-14 flex h-[100px] w-full flex-col justify-end">
         <h1 className="text-center text-2xl font-bold">
           Create Incident Report
         </h1>
@@ -243,7 +243,7 @@ export default function Create() {
                   <FormLabel>Incident Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Tell us a little bit about yourself"
+                      placeholder="Tell us a little bit about your report"
                       {...field}
                       disabled={isLoadingAi || isPendingCreateReport}
                     />
