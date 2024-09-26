@@ -67,7 +67,17 @@ export const reportRouter = createTRPCRouter({
       });
     }),
 
-  getReportedIncidents: publicProcedure.query(async ({ ctx }) => {
-    return ctx.db.incident.findMany();
-  }),
+  getReportedIncidents: publicProcedure
+    .input(z.object({ search: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      console.log("input", input);
+      return ctx.db.incident.findMany({
+        where: {
+          company: {
+            contains: input.search,
+            mode: "insensitive",
+          },
+        },
+      });
+    }),
 });

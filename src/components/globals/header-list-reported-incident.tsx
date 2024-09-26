@@ -8,7 +8,7 @@ import { cn } from "~/lib/utils";
 export function HeaderListReportedIncident({ total }: { total: number }) {
   const router = useRouter();
   return (
-    <div className="flex w-full items-center justify-between py-4">
+    <div className="flex w-full flex-col items-center justify-between py-4 sm:flex-row">
       <h1 className="text-2xl font-bold">
         Reported Incidents <span className="text-gray-500">({total})</span>
       </h1>
