@@ -6,16 +6,46 @@ import { Input } from "../ui/input";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { debounce } from "~/lib/utils";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export function SearchIncidentReport() {
+  // const router = useRouter();
+  // const [_, setSearchTerm] = useState("");
+
+  // const debouncedSearch = useCallback(
+  //   debounce((value: string) => {
+  //     router.push(`/?search=${encodeURIComponent(value)}`);
+  //   }, 300),
+  //   [router],
+  // );
+
+  // const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const value = e.target.value;
+  //   setSearchTerm(value);
+  //   debouncedSearch(value);
+  // };
+
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [_, setSearchTerm] = useState("");
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams);
+      params.set(name, value);
+      return params.toString();
+    },
+    [searchParams],
+  );
 
   const debouncedSearch = useCallback(
     debounce((value: string) => {
-      router.push(`/?search=${encodeURIComponent(value)}`);
+      router.push(`${pathname}?${createQueryString("search", value)}`, {
+        scroll: false,
+      });
     }, 300),
-    [router],
+    [router, pathname, createQueryString],
   );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
